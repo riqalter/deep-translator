@@ -18,18 +18,21 @@ class ChatGptTranslator(BaseTranslator):
         self,
         source: str = "auto",
         target: str = "english",
+        base_url: Optional[str] = None,
         api_key: Optional[str] = os.getenv(OPEN_AI_ENV_VAR, None),
         model: Optional[str] = "gpt-3.5-turbo",
         **kwargs,
     ):
         """
         @param api_key: your openai api key.
+        @param base_url: base url for the openai api 
         @param source: source language
         @param target: target language
         """
         if not api_key:
             raise ApiKeyException(env_var=OPEN_AI_ENV_VAR)
 
+        self.base_url = base_url
         self.api_key = api_key
         self.model = model
 
@@ -43,6 +46,9 @@ class ChatGptTranslator(BaseTranslator):
         import openai
 
         openai.api_key = self.api_key
+        
+        if self.base_url:
+            openai.base_url = self.base_url
 
         prompt = f"Translate the text below into {self.target}. Provide only the translated text without any additional explanations.\n"
         prompt += f'Text: "{text}"'
